@@ -11,7 +11,7 @@ mccabe==0.6.1
 mistune==0.8.4
 more-itertools==4.3.0
 mpmath==1.1.0
-odo==0.5.1
+odo==0.5.0
 path.py==11.5.0
 patsy==0.5.1
 pefile==2019.4.18
