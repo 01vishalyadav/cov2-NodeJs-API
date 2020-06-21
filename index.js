@@ -8,7 +8,6 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
-
 // connect to db
 mongoose.connect('mongodb+srv://admin_vishal1:asdfjkl@cluster0-zrf8s.mongodb.net/covid2?retryWrites=true&w=majority')
   .then(()=>console.log('connected to mongodb'))
