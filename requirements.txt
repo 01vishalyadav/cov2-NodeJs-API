@@ -48,9 +48,6 @@ python-dateutil==2.7.5
 requests==2.21.0
 rope==0.11.0
 ruamel-yaml==0.15.46
-scikit-image==0.14.1
-scikit-learn==0.20.1
-scipy==1.1.0
 seaborn==0.9.0
 selenium==3.141.0
 Send2Trash==1.5.0
@@ -74,7 +71,6 @@ tqdm==4.28.1
 traitlets==4.3.2
 unicodecsv==0.14.1
 urllib3==1.24.1
-vboxapi==1.0
 virtualenv==16.7.5
 virtualenvwrapper-win==1.2.5
 wcwidth==0.1.7
