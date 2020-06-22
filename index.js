@@ -9,9 +9,9 @@ app.use(express.json());
 app.use(helmet());
 app.use(compression());
 // connect to db
-mongoose.connect('mongodb+srv://admin_vishal1:asdfjkl@cluster0-zrf8s.mongodb.net/covid2?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://admin_vishal:asdfjkl@cluster0-zrf8s.mongodb.net/covid2?retryWrites=true&w=majority')
   .then(()=>console.log('connected to mongodb'))
-  .catch((err)=> console.log(`error: ${err}`));
+  .catch((err)=> console.log(`error in connecting to db: ${err}`));
 
 const districtsSchema = new mongoose.Schema({
   name:String,
@@ -104,7 +104,6 @@ function executeScript(res,districtName,id,flag){
 app.get('/', (req,res)=>{
   console.log("got a connection from: "+req.headers.host);
   res.send('Welcome to Covid2 app!');
-  return;
   // executeScript(res,'Azamgarh');
 });
 
