@@ -1,8 +1,6 @@
 beautifulsoup4==4.6.3
 MarkupSafe==1.1.0
 path.py==11.5.0
-patsy==0.5.1
-pefile==2019.4.18
 pep8==1.7.1
 pickleshare==0.7.5
 Pillow==5.3.0
@@ -38,8 +36,6 @@ ruamel-yaml==0.15.46
 seaborn==0.9.0
 selenium==3.141.0
 snowballstemmer==1.2.1
-sortedcollections==1.0.1
-sortedcontainers==2.1.0
 Sphinx==1.8.2
 sphinxcontrib-websupport==1.1.0
 statsmodels==0.9.0
