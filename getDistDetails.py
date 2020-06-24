@@ -10,7 +10,6 @@ def findOnline(dist):
     try:
       url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Uttar_Pradesh"
       page = requests.get(url)
-
       soup = BeautifulSoup(page.content, 'html.parser')
       soup.prettify()
       info=[]

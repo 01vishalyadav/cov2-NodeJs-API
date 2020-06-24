@@ -3,13 +3,17 @@ const mongoose = require('mongoose');
 const {spawn} = require('child_process');
 const helmet = require('helmet');
 const compression = require('compression');
+const fetch = require('node-fetch');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
-// connect to db
-mongoose.connect('mongodb+srv://admin_vishal:asdfjkl@cluster0-zrf8s.mongodb.net/covid2?retryWrites=true&w=majority')
+
+// connect to mongoDB
+mongoose.connect('mongodb://localhost/covid2')
   .then(()=>console.log('connected to mongodb'))
   .catch((err)=> console.log(`error in connecting to db: ${err}`));
 
@@ -100,9 +104,20 @@ function executeScript(res,districtName,id,flag){
   }
   });
 }
+function getData(){
+  fetch('http://localhost:3333/api/districts')
+    .then(function(res){
+      return res.json()
+    })
+    .then(function(data){
+      //data.forEach(user=>console.log(user.login));
+      console.log(data);
+    });
+}
 
 app.get('/', (req,res)=>{
   console.log("got a connection from: "+req.headers.host);
+  // getData();
   res.send('Welcome to Covid2 app!');
   // executeScript(res,'Azamgarh');
 });
@@ -111,13 +126,17 @@ app.get('/api/districts', (req,res) => {
   console.log("got a connection from: "+req.headers.host);
   findAllDistricts()
     .then(districts=>{
-    res.send(districts);
+      console.log("sending all data...")
+      res.send(districts);
   });
 });
 
 app.get('/api/districts/:districtName', (req,res) => {
   console.log("got a connection from: "+req.headers.host);
-  const districtNameToFind=req.params.districtName;
+  let temp=req.params.districtName;
+  temp.toLowerCase();
+  temp=temp.charAt(0).toUpperCase()+temp.slice(1);
+  const districtNameToFind=temp;
   // check if this dist exist
   findDistrict(districtNameToFind)
     .then(dist =>{
