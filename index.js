@@ -76,7 +76,7 @@ function executeScript(res,districtName,id,flag){
   python.on('close', (code) => {
   console.log(`child process close all stdio with code ${code}`);
   //send response to website
-  console.log("got data: ",dataToSend);
+  console.log("got data: "+dataToSend);
   if  (dataToSend.search("-1")!=-1)  {
     console.log('Cound not find '+ districtName+" even online!");
     console.log("sending response to website")
@@ -85,34 +85,34 @@ function executeScript(res,districtName,id,flag){
   else  {
     console.log("sending response to website");
     dataToSend=dataToSend.split(' ');
-    res.send({name:dataToSend[0],active:dataToSend[1],recovered:dataToSend[2],deaths:dataToSend[3],total:dataToSend[4]});
+    let length = dataToSend.length;
+    let name = "";
+    for(i=0;i<length-4;i++)
+    {
+      name+=dataToSend[i];
+      if(i<length-5 && length-5>0)
+      {
+        name+=" ";
+      }
+    }
+    res.send({name:name,active:dataToSend[length-4],recovered:dataToSend[length-3],deaths:dataToSend[length-2],total:dataToSend[length-1]});
 
     //create dist in database
     if  (flag==='c')  {
       console.log('c mode');
-      createDistrict(dataToSend[0],dataToSend[1],dataToSend[2],dataToSend[3],dataToSend[4])
+      createDistrict(name,dataToSend[length-4],dataToSend[length-3],dataToSend[length-2],dataToSend[length-1])
         .then(res=>console.log('doc created'))
         .catch(err=>console.log('error in creating doc '+err));
     }
     else if(flag==='u')
     {
       console.log('u mode');
-      updateDistrict(id,dataToSend[1],dataToSend[2],dataToSend[3],dataToSend[4])
+      updateDistrict(id,dataToSend[length-4],dataToSend[length-3],dataToSend[lenth-2],dataToSend[lenth-1])
         .then(res=>console.log('doc updated'))
         .catch(err=>console.log('error in updating doc '+err));
     }
   }
   });
-}
-function getData(){
-  fetch('http://localhost:3333/api/districts')
-    .then(function(res){
-      return res.json()
-    })
-    .then(function(data){
-      //data.forEach(user=>console.log(user.login));
-      console.log(data);
-    });
 }
 
 app.get('/', (req,res)=>{
@@ -134,9 +134,21 @@ app.get('/api/districts', (req,res) => {
 app.get('/api/districts/:districtName', (req,res) => {
   console.log("got a connection from: "+req.headers.host);
   let temp=req.params.districtName;
-  temp.toLowerCase();
-  temp=temp.charAt(0).toUpperCase()+temp.slice(1);
-  const districtNameToFind=temp;
+  console.log("search for: ",temp)
+  
+  temp = temp.toLowerCase();
+  let tempArray = temp.split(" ");
+  let dntf="";
+  for(i=0;i<tempArray.length;i++)
+  {
+    dntf+=tempArray[i].charAt(0).toUpperCase()+tempArray[i].slice(1);
+    if(i<tempArray.length-1 && tempArray.length>1)
+    {
+      dntf+=" ";
+    }
+  }
+  const districtNameToFind=dntf;
+  console.log("dntf:",districtNameToFind);
   // check if this dist exist
   findDistrict(districtNameToFind)
     .then(dist =>{
