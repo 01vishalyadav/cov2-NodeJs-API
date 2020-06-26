@@ -1,0 +1,6 @@
+{
+  "name":"cov2 node api",  
+  "mail":{
+    "host":"devmailserver"
+  }
+}

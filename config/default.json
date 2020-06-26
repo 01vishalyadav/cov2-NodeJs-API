@@ -1,0 +1,9 @@
+{
+  "name":"My api",
+  "pythonScript":"disabled",
+  "db":{
+    "user":"",
+    "password":"",
+    "place":"local"
+  }
+}

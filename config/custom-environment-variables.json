@@ -1,0 +1,8 @@
+{
+  "pythonScript":"cov2_node_api_python_script",
+  "db":{
+    "user":"cov2_node_api_db_user",
+    "password":"cov2_node_api_db_password",
+    "place":"cov2_node_api_db_place"
+  }
+}

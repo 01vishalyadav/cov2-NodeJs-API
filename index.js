@@ -1,19 +1,42 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const {spawn} = require('child_process');
+const config = require('config')
 const helmet = require('helmet');
 const compression = require('compression');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 const cors = require('cors');
+const morgan = require('morgan');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
+if(app.get('env')==='development')
+{
+  app.use(morgan('tiny'));
+}
 app.use(compression());
 
-// connect to mongoDB
-mongoose.connect('mongodb://localhost/covid2')
+//console.log('NODE_ENV:',process.env.NODE_ENV);//undefined if not SET/export
+// console.log(`app.get('env'): ${app.get('env')}`)//development if not SET/export
+if(app.get('env')==='development'){
+  console.log(`pythonScript=${config.get('pythonScript')}`);
+  console.log(`db.place=${config.get('db.place')}`);
+  console.log(`db.user=${config.get('db.user')}`);
+  console.log(`db.password=${config.get('db.password')}`);
+}
+// set connection string
+let connectionString = `mongodb://localhost/covid2`;
+if(app.get('env')==='production' || 
+  config.get('db.place')==='remote')
+{
+  console.log("connecting to remote db");
+  connectionString = `mongodb+srv://${config.get('db.user')}:${config.get('db.password')}@cluster0-zrf8s.mongodb.net/covid2?retryWrites=true&w=majority`;
+}
+
+//connect to db
+mongoose.connect(connectionString)
   .then(()=>console.log('connected to mongodb'))
   .catch((err)=> console.log(`error in connecting to db: ${err}`));
 
@@ -40,8 +63,11 @@ async function createDistrict(name,active,recovered,deaths,total){
 }
 
 async function findDistrict(districtNameToFind){
+  let dist=districtNameToFind
+  dist = `${districtNameToFind}`;
+  let distRegEx=new RegExp(dist,"i");
   const districts = await District
-  .find({name:districtNameToFind});
+  .find({name: districtNameToFind});
   // console.log(districts);
   return districts;
 }
@@ -69,12 +95,10 @@ function executeScript(res,districtName,id,flag){
   const python = spawn('python', ['getDistDetails.py',districtName]);
   // collect data from script
   python.stdout.on('data', function (data) {
-   console.log('Pipe data from python script ...');
    dataToSend = data.toString();
   });
   // in close event we are sure that stream from child process is closed
   python.on('close', (code) => {
-  console.log(`child process close all stdio with code ${code}`);
   //send response to website
   console.log("got data: "+dataToSend);
   if  (dataToSend.search("-1")!=-1)  {
@@ -154,28 +178,50 @@ app.get('/api/districts/:districtName', (req,res) => {
     .then(dist =>{
       if(dist.length>0){
         console.log('Found dist '+districtNameToFind);
-        // check if this dist is old
-        const lastUpdatedDate=dist[0].lastUpdated;
-        const currDate = new Date(Date.now());
-        if(lastUpdatedDate.getDate()<currDate.getDate()||
-           lastUpdatedDate.getMonth()<currDate.getMonth())
+        
+        
+        if(config.get('pythonScript')==='enabled')
         {
-          console.log(districtNameToFind+' is old');
-          executeScript(res,dist[0].name,dist[0]._id,'u');
+          // check if this dist is old
+          const lastUpdatedDate=dist[0].lastUpdated;
+          const currDate = new Date(Date.now());
+          if(lastUpdatedDate.getDate()<currDate.getDate()||
+           lastUpdatedDate.getMonth()<currDate.getMonth())
+          {
+            console.log(districtNameToFind+' is old');
+            executeScript(res,dist[0].name,dist[0]._id,'u');
+          }
+          else  
+          {
+            console.log(districtNameToFind+' is updated');
+            console.log('sending response');
+            res.send(dist[0]);
+          }
         }
-        else  {
-          console.log(districtNameToFind+' is updated');
-          console.log('sending response');
+        else
+        {
+          console.log('pythonScript disabled...');
+          console.log('sending old/new response');
           res.send(dist[0]);
         }
+        
       }
       else{
         // dist doesn't exist
         console.log("dist "+districtNameToFind+" does not exist in db");
         // execute script(it finds online,returns res
         // and then creates doc in database)
-        executeScript(res,districtNameToFind,-1,'c');
-        return;
+        if(config.get('pythonScript')==="enabled")
+        {
+          executeScript(res,districtNameToFind,-1,'c');
+          return;
+        }
+        else{
+          console.log('pythonScript disabled');
+          res.status(404).send("Not Found...");
+          return;
+        }
+        
       }
     })
     .catch(err=>{
