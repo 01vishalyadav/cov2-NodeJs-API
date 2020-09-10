@@ -131,7 +131,7 @@ function executeScript(res,districtName,id,flag){
     else if(flag==='u')
     {
       console.log('u mode');
-      updateDistrict(id,dataToSend[length-4],dataToSend[length-3],dataToSend[lenth-2],dataToSend[lenth-1])
+      updateDistrict(id,dataToSend[length-4],dataToSend[length-3],dataToSend[length-2],dataToSend[length-1])
         .then(res=>console.log('doc updated'))
         .catch(err=>console.log('error in updating doc '+err));
     }
