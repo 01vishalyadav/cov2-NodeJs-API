@@ -36,6 +36,7 @@ def findOnline(dist):
               temp = temp.replace(',','')
               info.append(temp)
             if(len(info)==4):
+              info[0],info[3]=info[3],info[0]
               ret = dist +' '+ info[0]+' '+info[1]+' '+info[2]+' '+info[3]
             # print(ret)
             if(len(info)==4):
