@@ -204,7 +204,6 @@ app.get('/api/districts/:districtName', (req,res) => {
           console.log('sending old/new response');
           res.send(dist[0]);
         }
-        
       }
       else{
         // dist doesn't exist
@@ -221,7 +220,6 @@ app.get('/api/districts/:districtName', (req,res) => {
           res.status(404).send("Not Found...");
           return;
         }
-        
       }
     })
     .catch(err=>{
